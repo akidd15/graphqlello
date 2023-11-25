@@ -1,2 +1,1 @@
-# graphqlello
-An application to search for new books!
+# Book Search Engine Starter Code
