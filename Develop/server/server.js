@@ -1,13 +1,13 @@
 const express = require('express');
 // import apolloserver and express server
-const { ApolloServer } = require('@apollo/server');
-const { expressMiddleware } = require('@apollo/server/express4')
+const { ApolloServer } = require('apollo-server-express');
+
 
 const { typeDefs, resolvers } = require('./schemas')
 const path = require('path');
 const db = require('./config/connection');
 const routes = require('./routes');
-const { start } = require('repl');
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
