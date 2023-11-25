@@ -33,7 +33,15 @@ module.exports = {
   },
   signToken: function ({ username, email, _id }) {
     const payload = { username, email, _id };
-
     return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
+  },
+  
+  graphqlAuthMiddleware: function (resolverFunction) {
+    return function (parent, args, context, info) {
+      if (!context.user) {
+        throw new Error('Authentication required for this resolver.');
+      }
+      return resolverFunction(parent, args, context, info);
+    };
   },
 };
