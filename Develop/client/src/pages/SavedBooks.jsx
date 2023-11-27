@@ -1,6 +1,6 @@
 //import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from "@apollo/client";
-
+import React from "react";
 import {
   Container,
   Card,
@@ -14,54 +14,78 @@ import { REMOVE_BOOK } from "../utils/mutations";
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
+
+
+
 const SavedBooks = () => {
-  //const [userData, setUserData] = useState({});
-const { loading, data } = useQuery(GET_ME);
-const [removeBook] = useMutation(REMOVE_BOOK);
-const userData = data?.user || {};
-  // use this to determine if `useEffect()` hook needs to run again
- // const userDataLength = Object.keys(userData).length;
-
- const handleDeleteBook = async(bookId) => {
-  const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-  if (!token) {
-    return false;
-  }
-  try{
-    await removeBook({
-      variables: { bookId },
-    });
-
-    removeBookId(bookId);
-    document.getElementById(bookId).remove();
-  } catch (err) {
-    console.error('GraphQL Request Error:', err);
-  }
- };
+  const user = data?.me;
+  const token = user?.token;
+  const { loading, data } = useQuery(GET_ME, {
+    context: {
+      headers: {
+        authorization: token ? `Bearer ${token}` : '',
+      },
+    },
+  });
+  
+  console.log(data);
 
  
 
-  // if data isn't here yet, say so
+  
+  
+  const [removeBook] = useMutation(REMOVE_BOOK);
+  const userData = data?.user || {};
+  // use this to determine if `useEffect()` hook needs to run again
+  // const userDataLength = Object.keys(userData).length;
+
+  const handleDeleteBook = async (bookId) => {
+    const token = Auth.loggedIn() ? Auth.getToken() : null;
+
+    if (!token) {
+      return false;
+    }
+    try {
+      await removeBook({
+        variables: { bookId },
+      });
+
+      removeBookId(bookId);
+      document.getElementById(bookId).remove();
+    } catch (err) {
+      console.error('GraphQL Request Error:', err);
+    }
+    console.log("auth")
+  };
+
+
+
+  //if data isn't here yet, say so
   if (loading) {
     return <h2>LOADING...</h2>;
   }
 
+
+  // if (error) {
+  //   console.error('GraphQL Error:', error);
+  //   return <h2>Error loading data</h2>;
+  // }
+
   return (
     <>
-      <div fluid className="text-light bg-dark p-5">
+      <div className="text-light bg-dark p-5" fluid="true">
         <Container>
           <h1>Viewing saved books!</h1>
         </Container>
       </div>
       <Container>
         <h2 className='pt-5'>
-          {userData.savedBooks.length
+          {userData.savedBooks && userData.savedBooks.length
             ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? 'book' : 'books'}:`
             : 'You have no saved books!'}
         </h2>
         <Row>
-          {userData.savedBooks.map((book) => {
+          {userData.savedBooks && userData.savedBooks.map((book) => {
             return (
               <Col md="4" key={book.bookId}>
                 <Card key={book.bookId} border='dark'>

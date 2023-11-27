@@ -11,6 +11,7 @@ import {
 import Auth from '../utils/auth';
 import { useMutation } from '@apollo/client';
 import { GET_ME } from '../utils/queries';
+import { REMOVE_BOOK } from '../utils/mutations'
 import { SAVE_BOOK } from '../utils/mutations';
 import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
@@ -64,29 +65,57 @@ const SearchBooks = () => {
   };
 
   // create function to handle saving a book to our database
+  // const handleSaveBook = async (bookId) => {
+  //   const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+  //   const token = Auth.loggedIn() ? Auth.getToken() : null;
+  //   if (!token) {
+  //     return false;
+  //   }
+
+  //   try {
+  //     await saveBook({
+  //       variables: { ...bookToSave },
+  //     });
+  
+  //     // Update state with the new bookId
+  //     setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+  
+  //     // Save the updated state to localStorage
+  //     saveBookIds([...savedBookIds, bookToSave.bookId]);
+  
+  //     console.log("book saved");
+  //   } catch (error) {
+  //     console.error("Error in handleSaveBook:", err);
+  //   }
+  // };
+
   const handleSaveBook = async (bookId) => {
-    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
     const token = Auth.loggedIn() ? Auth.getToken() : null;
+  
     if (!token) {
       return false;
     }
-
+    const bookToSave = searchedBooks.find(book => book.bookId === bookId);
+    
     try {
-      await saveBook({
-        variables: { ...bookToSave },
+      const { data } = await saveBook({
+        variables: { bookToSave },
       });
-  
-      // Update state with the new bookId
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-  
-      // Save the updated state to localStorage
-      saveBookIds([...savedBookIds, bookToSave.bookId]);
-  
-      console.log("book saved");
+
+      if (data && data.saveBook) {
+        // If the mutation is successful, update state and localStorage
+        setSavedBookIds([...savedBookIds, bookId]);
+        saveBookIds([...savedBookIds, bookId]);
+        console.log("Book saved successfully!");
+      } else {
+        console.error("Save book mutation returned no data.");
+      }
     } catch (error) {
-      console.error("Error in handleSaveBook:", err);
+      console.error("Error in handleSaveBook:", error);
     }
   };
+
+  
 
 
   return (
