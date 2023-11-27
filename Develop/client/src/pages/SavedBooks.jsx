@@ -36,7 +36,7 @@ const userData = data?.user || {};
     removeBookId(bookId);
     document.getElementById(bookId).remove();
   } catch (err) {
-    console.error(err);
+    console.error('GraphQL Request Error:', err);
   }
  };
 
@@ -63,7 +63,7 @@ const userData = data?.user || {};
         <Row>
           {userData.savedBooks.map((book) => {
             return (
-              <Col md="4">
+              <Col md="4" key={book.bookId}>
                 <Card key={book.bookId} border='dark'>
                   {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
                   <Card.Body>

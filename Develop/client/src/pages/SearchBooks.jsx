@@ -65,25 +65,30 @@ const SearchBooks = () => {
 
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
-    const bookToSave = searchedBooks.find((book) => book.bookId === bookId)
+    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
     const token = Auth.loggedIn() ? Auth.getToken() : null;
     if (!token) {
       return false;
     }
-    
+
     try {
       await saveBook({
-        variables: { bookToSave }
+        variables: { ...bookToSave },
       });
-      
-
+  
+      // Update state with the new bookId
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-      saveBookIds(savedBookIds);
-      console.log("book saved")
+  
+      // Save the updated state to localStorage
+      saveBookIds([...savedBookIds, bookToSave.bookId]);
+  
+      console.log("book saved");
     } catch (error) {
-      console.error(error);
+      console.error("Error in handleSaveBook:", err);
     }
   };
+
+
   return (
     <>
       <div className="text-light bg-dark p-5">
