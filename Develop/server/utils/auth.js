@@ -1,3 +1,5 @@
+const { GraphQLError } = require("graphql");
+// added graphqlerror
 const jwt = require('jsonwebtoken');
 
 // set token secret and expiration date
@@ -6,9 +8,14 @@ const expiration = '2h';
 
 module.exports = {
   // function for our authenticated routes
-  authMiddleware: function (req, res, next) {
+  AuthenticationError: new GraphQLError("Could not authenticate user.", {
+    extensions: {
+      code: "UNAUTHENTICATED",
+    },
+ }),
+  authMiddleware: function (req, res) {
     // allows token to be sent via  req.query or headers
-    let token = req.query.token || req.headers.authorization;
+    let token = req.query.token || req.headers.authorization || req.body.token;
 
     // ["Bearer", "<tokenvalue>"]
     if (req.headers.authorization) {
@@ -28,21 +35,21 @@ module.exports = {
       return res.status(400).json({ message: 'invalid token!' });
     }
 
-    // send to next endpoint
-    next();
+  return req;
   },
   // function to sign tokens
   signToken: function ({ username, email, _id }) {
     const payload = { username, email, _id };
     return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
-  },
-  // Middleware for graphql resolvers
-  graphqlAuthMiddleware: function (resolverFunction) {
-    return function (parent, args, context, info) {
-      if (!context.user) {
-        throw new Error('Authentication required for this resolver.');
-      }
-      return resolverFunction(parent, args, context, info);
-    };
-  },
+  }
 };
+  // Middleware for graphql resolvers
+//   graphqlAuthMiddleware: function (resolverFunction) {
+//     return function (parent, args, context, info) {
+//       if (!context.user) {
+//         throw new Error('Authentication required for this resolver.');
+//       }
+//       return resolverFunction(parent, args, context, info);
+//     };
+//   },
+// };
