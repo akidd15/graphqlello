@@ -3,9 +3,9 @@ const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 const path = require('path');
 const db = require('./config/connection');
-const { authMiddleware } = require('./schemas');
+const { authMiddleware } = require('./schemas').default;
 const cors = require('cors');
-const { typeDefs, resolvers } = require('./schemas');
+const { typeDefs, resolvers } = require('./schemas').default;
 
 const app = express();
 app.use(cors());
