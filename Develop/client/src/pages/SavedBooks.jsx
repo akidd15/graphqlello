@@ -1,6 +1,6 @@
 //import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from "@apollo/client";
-import React from "react";
+// import React from "react";
 import {
   Container,
   Card,
@@ -18,33 +18,18 @@ import { removeBookId } from '../utils/localStorage';
 
 
 const SavedBooks = () => {
-  const user = data?.me;
-  const token = user?.token;
-  const { loading, data } = useQuery(GET_ME, {
-    context: {
-      headers: {
-        authorization: token ? `Bearer ${token}` : '',
-      },
-    },
-  });
-  
-  console.log(data);
-
- 
-
-  
-  
+  const { loading, data } = useQuery(GET_ME);
   const [removeBook] = useMutation(REMOVE_BOOK);
   const userData = data?.user || {};
-  // use this to determine if `useEffect()` hook needs to run again
-  // const userDataLength = Object.keys(userData).length;
 
+  // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
       return false;
     }
+
     try {
       await removeBook({
         variables: { bookId },
@@ -53,23 +38,15 @@ const SavedBooks = () => {
       removeBookId(bookId);
       document.getElementById(bookId).remove();
     } catch (err) {
-      console.error('GraphQL Request Error:', err);
+      console.error(err);
     }
-    console.log("auth")
   };
 
-
-
-  //if data isn't here yet, say so
+  // if data isn't here yet, say so
   if (loading) {
     return <h2>LOADING...</h2>;
   }
 
-
-  // if (error) {
-  //   console.error('GraphQL Error:', error);
-  //   return <h2>Error loading data</h2>;
-  // }
 
   return (
     <>

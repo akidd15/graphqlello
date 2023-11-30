@@ -21,10 +21,11 @@ const SearchBooks = () => {
   const [searchedBooks, setSearchedBooks] = useState([]);
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
-  const [saveBook] = useMutation(SAVE_BOOK);
+  
 
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
+  const [saveBook] = useMutation(SAVE_BOOK);
 
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
   
@@ -66,35 +67,28 @@ const SearchBooks = () => {
 
 
   const handleSaveBook = async (bookId) => {
-    //tutor add here
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-
     const token = Auth.loggedIn() ? Auth.getToken() : null;
   
-    if (!token) {
+    if (!token || !bookToSave) {
       return false;
     }
-    //const bookToSave = searchedBooks.find(book => book.bookId === bookId);
-    // possible fix variables here???!!!
-    //tutor change variables from bookToSave to bookData and saveBook to 
+  
     try {
-    const { data } = await saveBook({
-        variables: { bookData: {...bookToSave }},
+      await saveBook({
+        variables: { bookToSave },
       });
-      console.log(savedBookIds);
+
+      // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-      //tutor commented out the  below
-      //  if (data && data.saveBook) {
-      //   // If the mutation is successful, update state and localStorage
-      //   setSavedBookIds([...savedBookIds, bookId]);
-      //   saveBookIds([...savedBookIds, bookId]);
-      //   console.log("Book saved successfully!");
-      // } else {
-      //   console.error("Save book mutation returned no data.");
-    } catch (error) {
-      console.error("Error in handleSaveBook:", error);
-    };
+      saveBookIds(savedBookIds);
+      console.log("Book has been saved.");
+    } catch (err) {
+      console.error(err);
+      console.log(err);
+    }
   };
+  
 
   
 
@@ -148,8 +142,10 @@ const SearchBooks = () => {
                       <Button
                         disabled={savedBookIds?.some((savedBookId) => savedBookId === book.bookId)}
                         className='btn-block btn-info'
-                        onClick={() => handleSaveBook(book.bookId)}>
-                        {savedBookIds?.some((savedBookId) => savedBookId === book.bookId)
+                        onClick={() => handleSaveBook(book.bookId)}
+                        >
+                        {savedBookIds?.some(
+                          (savedBookId) => savedBookId === book.bookId)
                           ? 'This book has already been saved!'
                           : 'Save this Book!'}
                       </Button>
