@@ -27,7 +27,7 @@ const SearchBooks = () => {
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
-  // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
+  
   useEffect(() => {
     return () => saveBookIds(savedBookIds);
   });
@@ -64,55 +64,36 @@ const SearchBooks = () => {
     }
   };
 
-  // create function to handle saving a book to our database
-  // const handleSaveBook = async (bookId) => {
-  //   const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-  //   const token = Auth.loggedIn() ? Auth.getToken() : null;
-  //   if (!token) {
-  //     return false;
-  //   }
-
-  //   try {
-  //     await saveBook({
-  //       variables: { ...bookToSave },
-  //     });
-  
-  //     // Update state with the new bookId
-  //     setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-  
-  //     // Save the updated state to localStorage
-  //     saveBookIds([...savedBookIds, bookToSave.bookId]);
-  
-  //     console.log("book saved");
-  //   } catch (error) {
-  //     console.error("Error in handleSaveBook:", err);
-  //   }
-  // };
 
   const handleSaveBook = async (bookId) => {
+    //tutor add here
+    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+
     const token = Auth.loggedIn() ? Auth.getToken() : null;
   
     if (!token) {
       return false;
     }
-    const bookToSave = searchedBooks.find(book => book.bookId === bookId);
-    
+    //const bookToSave = searchedBooks.find(book => book.bookId === bookId);
+    // possible fix variables here???!!!
+    //tutor change variables from bookToSave to bookData and saveBook to 
     try {
-      const { data } = await saveBook({
-        variables: { bookToSave },
+    const { data } = await saveBook({
+        variables: { bookData: {...bookToSave }},
       });
-
-      if (data && data.saveBook) {
-        // If the mutation is successful, update state and localStorage
-        setSavedBookIds([...savedBookIds, bookId]);
-        saveBookIds([...savedBookIds, bookId]);
-        console.log("Book saved successfully!");
-      } else {
-        console.error("Save book mutation returned no data.");
-      }
+      console.log(savedBookIds);
+      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      //tutor commented out the  below
+      //  if (data && data.saveBook) {
+      //   // If the mutation is successful, update state and localStorage
+      //   setSavedBookIds([...savedBookIds, bookId]);
+      //   saveBookIds([...savedBookIds, bookId]);
+      //   console.log("Book saved successfully!");
+      // } else {
+      //   console.error("Save book mutation returned no data.");
     } catch (error) {
       console.error("Error in handleSaveBook:", error);
-    }
+    };
   };
 
   
