@@ -8,10 +8,10 @@ const resolvers = {
       if (context.user) {
         const userData = await User.findOne({
           _id: context.user._id
-        }).select("-_v-password").populate("savedBooks");
+        }).select("-__v -password").populate("savedBooks");
         return userData;
       }
-      throw AuthenticationError;
+      throw AuthenticationError('Error message');
     },
 
   },
@@ -60,10 +60,11 @@ const resolvers = {
         { new: true },
       )
       return updatedUser;
+    } else {
+      throw new UserInputError('Book is already saved.');
     }
-  }
+  },
 }
+
 };
-
-
 module.exports = resolvers;

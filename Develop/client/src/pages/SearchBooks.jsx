@@ -70,15 +70,14 @@ const SearchBooks = () => {
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
     const token = Auth.loggedIn() ? Auth.getToken() : null;
   
-    if (!token || !bookToSave) {
+    if (!token) {
       return false;
     }
-  
+
     try {
       await saveBook({
-        variables: { input: { ...bookToSave } },
+        variables: { bookToSave },
       });
-      
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds((prevSavedBookIds) => [...savedBookIds, bookToSave.bookId]);
