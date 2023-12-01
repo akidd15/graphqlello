@@ -1,4 +1,4 @@
-const { User, Book } = require('../models');
+const { User } = require('../models');
 const { signToken, AuthenticationError } = require('../utils/auth');
 
 
@@ -8,7 +8,7 @@ const resolvers = {
       if (context.user) {
         const userData = await User.findOne({
           _id: context.user._id
-        }).select("-__v -password").populate("savedBooks");
+        }).select("-__v -password");
         return userData;
       }
       throw AuthenticationError('Error message');
@@ -41,13 +41,13 @@ const resolvers = {
   },
 
 
-  saveBook: async (parent, { bookToSave }, context) => {
+  saveBook: async (parent, { bookData }, context) => {
     if (context.user) {
       const updatedUser = await User.findOneAndUpdate(
         { _id: context.user._id },
-        { $addToSet: { savedBooks: bookToSave } },
+        { $addToSet: { savedBooks: bookData } },
         { new: true },
-      ).populate("savedBooks");
+      );
       return updatedUser;
     }
     throw AuthenticationError;

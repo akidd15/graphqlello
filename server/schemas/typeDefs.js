@@ -2,9 +2,6 @@
 const { gql } = require('graphql-tag');
 
 const typeDefs = gql`
-
-
-
   type User {
     _id: ID!
     username: String!
@@ -14,7 +11,7 @@ const typeDefs = gql`
   }
 
   type Book {
-    bookId: String!
+    bookId: ID!
     authors: [String]
     description: String
     title: String
@@ -26,7 +23,7 @@ const typeDefs = gql`
     token: ID!
     user: User
   }
-  
+
   input bookInput {
     authors: [String]
     description: String
